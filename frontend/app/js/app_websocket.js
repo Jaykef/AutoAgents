@@ -569,9 +569,30 @@ async function sendMessage(exampleMessage) {
         exampleMessagesID.style.display = 'none';
 
         // show Stop button
+        const interruptButton = document.createElement('button');
+        const callingMessages = document.querySelectorAll("calling-message");
+
         interruptButton.textContent = 'Stop';
-        interruptButton.style.color = 'black';
-        interruptButton.style.display = '';
+        interruptButton.id = 'interruptButton';
+        interruptButton.classList.add('btn', 'btn-primary', 'mb-3');
+        interruptButton.addEventListener('click', async () => {
+            clearCallingMessages();
+            if (taskId != null) {
+                ws.send(JSON.stringify({
+                    "action": "interrupt",
+                    "data": {
+                        "task_id": taskId
+                    }
+                }));
+            }
+            interruptButton.style.color = 'red';
+            interruptButton.textContent = 'Stopped';
+            
+            callingMessages.forEach((callingMessage) => {
+                callingMessage.style.display = "none !important";
+            })
+        });
+        chatView.appendChild(interruptButton);
     }
 }
 
