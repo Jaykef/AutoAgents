@@ -200,11 +200,9 @@ pre {
 .calling-message {
     font-style: italic;
     color: #1ec87f;
+    margin-left: 3.7rem;
     font-weight: 700;
-    left: 50px;
-    position: absolute;
-    bottom: 180px;
-    display: none;
+    margin-top: -20px;
 }
 .toggle-buttons {
     text-align: center;
@@ -250,13 +248,7 @@ pre {
         margin-left: -1rem !important;
     }
     .calling-message {
-        font-style: italic;
-        color: #1ec87f;
-        font-weight: 600;
-        position: absolute;
-        bottom: 140px !important;
-        left: 20px !important;
-        display: none;
+        margin-left: 3.2rem;
     }
     .alert, .expert-name {
         font-size: 10px;
