@@ -177,9 +177,10 @@ async function renderLeadAgentsResponses(responseData) {
         chatView.appendChild(agentDiv);
 
         chatView.scrollTop = chatView.scrollHeight;
-        // showCallingNextAgentMessage().stop();
+        
+        clearCallingMessages();
     }
-    // showCallingNextAgentMessage();
+    showCallingNextAgentMessage();
     chatView.scrollTop = chatView.scrollHeight;
 }
 
@@ -196,7 +197,9 @@ async function renderTaskAgentsResponse(responseData) {
             const agentDiv = createAgentChatDiv(msg.task_message);
             chatView.appendChild(agentDiv);
             chatView.scrollTop = chatView.scrollHeight;
+            clearCallingMessages();
         }
+        showCallingNextAgentMessage();
     }
 }
 
@@ -310,31 +313,45 @@ function createAgentChatDiv(msg) {
 }
 
 
-let callingMessageCount = 0; // keep track of calling messages
+let callingMessageCount = 0;
+let callingMessageInterval = null;
+
+function clearCallingMessages() {
+  const chatView = document.getElementById('chatView');
+  const callingMessages = chatView.querySelectorAll('.calling-message');
+  callingMessages.forEach((message) => {
+      chatView.removeChild(message);
+  });
+  clearInterval(callingMessageInterval);
+}
+
 function showCallingNextAgentMessage() {
-    const chatView = document.getElementById('chatView');
-    const callingMessage = document.createElement('p');
-    callingMessage.className = 'calling-message fs';
-    callingMessage.textContent = 'Calling next agent';
-    callingMessage.dataset.messageId = callingMessageCount;
-    chatView.appendChild(callingMessage);
-    callingMessageCount++;
+  const chatView = document.getElementById('chatView');
+  const callingMessage = document.createElement('p');
+  callingMessage.className = 'calling-message fs';
+  callingMessage.textContent = 'Calling next agent';
+  callingMessage.dataset.messageId = callingMessageCount;
+  chatView.appendChild(callingMessage);
+  callingMessageCount++;
 
-    const animationFrames = ['Calling', 'Calling next', 'Calling next agent..', 'Calling next agent...'];
-    let frameIndex = 0;
+  const animationFrames = ['Calling', 'Calling next', 'Calling next agent..', 'Calling next agent...'];
+  let frameIndex = 0;
 
-    const updateMessage = () => {
-        callingMessage.textContent = animationFrames[frameIndex];
-        frameIndex = (frameIndex + 1) % animationFrames.length;
-    };
-    const interval = setInterval(updateMessage, 500);
+  const updateMessage = () => {
+      callingMessage.textContent = animationFrames[frameIndex];
+      frameIndex = (frameIndex + 1) % animationFrames.length;
+  };
+  callingMessageInterval = setInterval(updateMessage, 500);
 
-    return {
-        stop: () => {
-            clearInterval(interval);
-            chatView.removeChild(callingMessage);
-        }
-    };
+  return {
+      stop: () => {
+          if (callingMessage.dataset.messageId == callingMessageCount - 1) {
+              callingMessage.style.display = 'none';
+          }
+          clearInterval(callingMessageInterval);
+          chatView.removeChild(callingMessage);
+      }
+  };
 }
 
 function showFullText(element) {
@@ -555,7 +572,6 @@ async function sendMessage(exampleMessage) {
         interruptButton.textContent = 'Stop';
         interruptButton.style.color = 'black';
         interruptButton.style.display = '';
-        document.getElementById('calling-next-agent').style.display = 'block';
     }
 }
 
@@ -578,7 +594,6 @@ async function clearChat() {
     for(var i = invitedExperts.length-1; i >= 0; i--) {
         invitedExperts[i].remove();
     }
-    document.getElementById('calling-next-agent').style.display = 'none';
     // progress
     document.getElementById('taskView').innerHTML = '';
     // examples
@@ -589,7 +604,6 @@ async function clearChat() {
     previousScrolledDiv = null;
     renderedAgentMessage = {};
     renderedLeadAgents = {};
-    callingMessageCount = 0;
     renderedTasks = {};
     taskStepCount = 0;
     agentProfileImages = {};
@@ -632,6 +646,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 const interruptButton = document.getElementById('interruptButton');
 interruptButton.addEventListener('click', async () => {
+    clearCallingMessages();
     if (taskId && ws) {
         ws.send(JSON.stringify({
             "action": "interrupt",
@@ -644,14 +659,8 @@ interruptButton.addEventListener('click', async () => {
         if(interruptButton.textContent == 'Stop'){
             interruptButton.textContent = 'Stopped';
         }
-        
-        const callingMessages = document.querySelectorAll("calling-message");
-        callingMessages.forEach((callingMessage) => {
-            callingMessage.style.display = "none !important";
-        })
 
         clearButton.style.display = '';
-        document.getElementById('calling-next-agent').style.display = 'none';
     }
 });
 const clearButton = document.getElementById('clearButton');
@@ -686,6 +695,7 @@ async function connect() {
                 await displayTasks(responseData);
                 await displayTaskSteps(responseData);
             } else if (response['msg'] == 'finished') {
+                clearCallingMessages();
                 console.log("task: " + taskId + " finished.");
                 taskId = null;
 
@@ -696,7 +706,6 @@ async function connect() {
                 }
                 
                 clearButton.style.display = '';
-                document.getElementById('calling-next-agent').style.display = 'none';
                 
             } else {
                 // errors
@@ -707,20 +716,15 @@ async function connect() {
         }
         else if (response['action'] == "interrupt") {
             if (response['msg'] == 'ok') {
+                clearCallingMessages();
                 console.log("task: " + taskId + " interrupted.");
                 
                 interruptButton.style.color = 'red';
                 if(interruptButton.textContent == 'Stop'){
                     interruptButton.textContent = 'Stopped';
                 }
-                
-                const callingMessages = document.querySelectorAll("calling-message");
-                callingMessages.forEach((callingMessage) => {
-                    callingMessage.style.display = "none !important";
-                })
     
                 clearButton.style.display = '';
-                document.getElementById('calling-next-agent').style.display = 'none';
             }
         }
     }
@@ -762,19 +766,6 @@ document.addEventListener('DOMContentLoaded', function () {
         document.getElementById('serp-api-key').value = serpApiKey;
         localStorage.removeItem('serpapi_key');
     }
-    setInterval(callingNextAgent, 100);
 });
 
-function callingNextAgent() {
-    node = document.getElementById('calling-next-agent');
-    let text = node.getAttribute('data-content');
-    var i = parseInt(node.getAttribute('data-index'));
-    if(i == 0) {
-        node.textContent = '';
-    }
-    if (i < text.length) {
-        node.textContent += text.charAt(i);
-        i = (i+1) % text.length;
-        node.setAttribute('data-index', i.toString());
-    }
-}
+
