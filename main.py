@@ -17,7 +17,7 @@ logger = logging.getLogger(__name__)
 def signal_handler(signal, frame):
     sys.exit(1)
 
-async def commanline(investment: float = 10.0, n_round: int = 3, proxy: str = None, llm_api_key: str = None, serpapi_key: str=None, idea: str=None):
+async def commanline(investment: float = 10.0, n_round: int = 3, proxy: str = None, llm_api_key: str = "default_openai_api_key", serpapi_key: str="default_serpapi_key", idea: str="default_idea"):
     if llm_api_key is None:
         print("OpenAI API key:")
         llm_api_key = input().strip()
