@@ -145,15 +145,21 @@ class OpenAIGPTAPI(BaseGPTAPI, RateLimiter):
         if self.proxy != '':
             # TODO: The 'openai.proxy' option isn't read in the client API. You will need to pass it when you instantiate the client, e.g. 'OpenAI(proxy=self.proxy)'
             # openai.proxy = self.proxy
+            pass
         else:
+            pass
 
         if self.api_key != '':
+            pass
         else:
+            pass
 
         if config.openai_api_base:
             # TODO: The 'openai.api_base' option isn't read in the client API. You will need to pass it when you instantiate the client, e.g. 'OpenAI(base_url=config.openai_api_base)'
             # openai.api_base = config.openai_api_base
+            pass
         if config.openai_api_type:
+            pass
         self.rpm = int(config.get("RPM", 10))
 
     async def _achat_completion_stream(self, messages: list[dict]) -> str:
