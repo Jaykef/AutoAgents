@@ -8,10 +8,7 @@ from typing import NamedTuple
 import openai
 from openai import AsyncAzureOpenAI
 
-aclient = AsyncAzureOpenAI(api_key=config.openai_api_key,
-api_key=self.api_key,
-api_key=config.openai_api_key,
-api_version=config.openai_api_version)
+aclient = AsyncAzureOpenAI(api_key=config.openai_api_key)
 
 from autoagents.config import CONFIG
 from autoagents.logs import logger
