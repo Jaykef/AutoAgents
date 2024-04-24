@@ -9,7 +9,7 @@ import openai
 from openai import AsyncAzureOpenAI
 
 from autoagents.config import CONFIG
-aclient = AsyncAzureOpenAI(api_key=CONFIG.openai_api_key)
+aclient = AsyncAzureOpenAI(api_key=CONFIG.openai_api_key, api_version=CONFIG.openai_api_version)
 
 from autoagents.logs import logger
 from autoagents.provider.base_gpt_api import BaseGPTAPI
