@@ -6,6 +6,12 @@ from functools import wraps
 from typing import NamedTuple
 
 import openai
+from openai import AsyncAzureOpenAI
+
+aclient = AsyncAzureOpenAI(api_key=config.openai_api_key,
+api_key=self.api_key,
+api_key=config.openai_api_key,
+api_version=config.openai_api_version)
 
 from autoagents.config import CONFIG
 from autoagents.logs import logger
@@ -137,27 +143,22 @@ class OpenAIGPTAPI(BaseGPTAPI, RateLimiter):
 
     def __init_openai(self, config):
         if self.proxy != '':
-            openai.proxy = self.proxy
+            # TODO: The 'openai.proxy' option isn't read in the client API. You will need to pass it when you instantiate the client, e.g. 'OpenAI(proxy=self.proxy)'
+            # openai.proxy = self.proxy
         else:
-            openai.api_key = config.openai_api_key
-        
+
         if self.api_key != '':
-            openai.api_key = self.api_key
         else:
-            openai.api_key = config.openai_api_key
-        
+
         if config.openai_api_base:
-            openai.api_base = config.openai_api_base
+            # TODO: The 'openai.api_base' option isn't read in the client API. You will need to pass it when you instantiate the client, e.g. 'OpenAI(base_url=config.openai_api_base)'
+            # openai.api_base = config.openai_api_base
         if config.openai_api_type:
-            openai.api_type = config.openai_api_type
-            openai.api_version = config.openai_api_version
         self.rpm = int(config.get("RPM", 10))
 
     async def _achat_completion_stream(self, messages: list[dict]) -> str:
-        response = await openai.ChatCompletion.acreate(
-            **self._cons_kwargs(messages),
-            stream=True
-        )
+        response = await aclient.chat.completions.create(**self._cons_kwargs(messages),
+        stream=True)
 
         # create variables to collect the stream of chunks
         collected_chunks = []
