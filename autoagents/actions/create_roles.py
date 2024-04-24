@@ -95,16 +95,10 @@ class CreateRoles(Action):
         super().__init__(name, context, llm)
 
     async def run(self, context):
-        # sas = SearchAndSummarize()
-        # rsp = await sas.run(context=context, system_text=SEARCH_AND_SUMMARIZE_SYSTEM_EN_US)
-        # rsp = ""
-        # info = f"## Search Results\n{sas.result}\n\n## Search Summary\n{rsp}"
-        # if sas.result:
-        #     logger.info(sas.result)
-        #     logger.info(rsp)
-
-        prompt = PROMPT_TEMPLATE.format(context=context, format_example=FORMAT_EXAMPLE, tools=TOOLS) # search_information=info,
+        prompt = PROMPT_TEMPLATE.format(context=context, format_example=FORMAT_EXAMPLE, tools=TOOLS)
+        print(f"Prompt: {prompt}")  # Print the prompt to debug
         rsp = await self._aask_v1(prompt, "task", OUTPUT_MAPPING)
+        print(f"Response: {rsp}")  # Print the response to debug
         return rsp
 
 
