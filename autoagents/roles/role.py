@@ -174,14 +174,23 @@ class Role:
         return msg
 
     async def _observe(self) -> int:
-        """从环境中观察，获得重要信息，并加入记忆"""
+        """From the environment, observe and get important information, and add it to memory."""
         if not self._rc.env:
             return 0
         env_msgs = self._rc.env.memory.get()
-        
+
         observed = self._rc.env.memory.get_by_actions(self._rc.watch)
-        
+
         news = self._rc.memory.remember(observed)  # remember recent exact or similar memories
+
+        if news is None:
+            logger.debug(f'{self._setting} observed: news is None')
+            return 0
+        else:
+            news_text = [f"{i.role}: {i.content[:20]}..." for i in news]
+            if news_text:
+                logger.debug(f'{self._setting} observed: {news_text}')
+            return len(news)
 
         for i in env_msgs:
             self.recv(i)
