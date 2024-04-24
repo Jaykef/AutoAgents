@@ -17,16 +17,17 @@ class MockAsyncAzureOpenAI:
 
     async def chat_completions_create(self, **kwargs):
         # Return a mock response with the expected fields in the correct format
-        mock_response = """
-        Roles List:
-          - Role1: Expert in X using Tool1 for Step1
-          - Role2: Expert in Y using Tool2 for Step2
-        Execution Plan:
-          - Role1 performs Step1
-          - Role2 performs Step2
-        Anything UNCLEAR: Clarification needed on Z.
-        """
-        return mock_response.strip()
+        return {
+            "Roles List": [
+                "Role1: Expert in X using Tool1 for Step1",
+                "Role2: Expert in Y using Tool2 for Step2"
+            ],
+            "Execution Plan": [
+                "Role1 performs Step1",
+                "Role2 performs Step2"
+            ],
+            "Anything UNCLEAR": "Clarification needed on Z."
+        }
 
 # Replace the actual AsyncAzureOpenAI client with the mock
 aclient = MockAsyncAzureOpenAI()
