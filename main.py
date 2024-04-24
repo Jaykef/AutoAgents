@@ -18,15 +18,6 @@ def signal_handler(signal, frame):
     sys.exit(1)
 
 async def commanline(investment: float = 10.0, n_round: int = 3, proxy: str = None, llm_api_key: str = "default_openai_api_key", serpapi_key: str="default_serpapi_key", idea: str="default_idea"):
-    if llm_api_key is None:
-        print("OpenAI API key:")
-        llm_api_key = input().strip()
-    if serpapi_key is None:
-        print("SerpAPI key:")
-        serpapi_key = input().strip()
-    if idea is None:
-        print("Give me a task idea:")
-        idea = input().strip()
     await startup.startup(idea, investment, n_round, llm_api_key=llm_api_key, serpapi_key=serpapi_key, proxy=proxy)
 
 async def service(host: str = "localhost", port: int = 9000, proxy: str=None, llm_api_key: str=None, serpapi_key: str=None):
