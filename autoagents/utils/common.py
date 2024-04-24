@@ -23,20 +23,27 @@ class OutputParser:
 
     @classmethod
     def parse_blocks(cls, text: str):
-        # 首先根据"##"将文本分割成不同的block
+        # Split text into blocks separated by "##"
         blocks = text.split("##")
 
-        # 创建一个字典，用于存储每个block的标题和内容
+        # Create a dictionary to store each block's title and content
         block_dict = {}
 
-        # 遍历所有的block
+        # Iterate through all blocks
         for block in blocks:
-            # 如果block不为空，则继续处理
+            # If block is not empty, continue processing
             if block.strip() != "":
-                # 将block的标题和内容分开，并分别去掉前后的空白字符
-                block_title, block_content = block.split("\n", 1)
-                # LLM可能出错，在这里做一下修正
-                if block_title[-1] == ":":
+                # Check if the block contains a newline character
+                if "\n" in block:
+                    # Split block into title and content
+                    block_title, block_content = block.split("\n", 1)
+                else:
+                    # If no newline is present, the whole block is content
+                    block_title = ""
+                    block_content = block
+
+                # Correct any errors from LLM and strip whitespace
+                if block_title.endswith(":"):
                     block_title = block_title[:-1]
                 block_dict[block_title.strip()] = block_content.strip()
 
