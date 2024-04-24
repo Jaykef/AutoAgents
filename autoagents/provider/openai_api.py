@@ -20,6 +20,7 @@ from autoagents.utils.token_counter import (
     count_string_tokens,
 )
 
+aclient = AsyncAzureOpenAI(api_key=CONFIG.openai_api_key)
 
 def retry(max_retries):
     def decorator(f):
