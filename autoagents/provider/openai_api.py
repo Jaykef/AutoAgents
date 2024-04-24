@@ -8,9 +8,9 @@ from typing import NamedTuple
 import openai
 from openai import AsyncAzureOpenAI
 
+from autoagents.config import CONFIG
 aclient = AsyncAzureOpenAI(api_key=CONFIG.openai_api_key)
 
-from autoagents.config import CONFIG
 from autoagents.logs import logger
 from autoagents.provider.base_gpt_api import BaseGPTAPI
 from autoagents.utils.singleton import Singleton
@@ -19,8 +19,6 @@ from autoagents.utils.token_counter import (
     count_message_tokens,
     count_string_tokens,
 )
-
-aclient = AsyncAzureOpenAI(api_key=CONFIG.openai_api_key)
 
 def retry(max_retries):
     def decorator(f):
