@@ -1,7 +1,6 @@
 from autoagents.provider.anthropic_api import Claude2 as Claude
-from autoagents.provider.openai_api import OpenAIGPTAPI as LLM
 
-DEFAULT_LLM = LLM()
+DEFAULT_LLM = Claude()
 CLAUDE_LLM = Claude()
 
 
