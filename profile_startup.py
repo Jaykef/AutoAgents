@@ -2,7 +2,11 @@ import asyncio
 import cProfile
 import pstats
 import io
+import logging
 from startup import startup
+
+# Set up logging to capture debug messages
+logging.basicConfig(level=logging.DEBUG)
 
 # Function to profile
 async def profile_startup():

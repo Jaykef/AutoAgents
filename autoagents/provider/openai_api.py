@@ -18,20 +18,13 @@ class MockAsyncAzureOpenAI:
     async def chat_completions_create(self, **kwargs):
         # Return a mock response with the expected fields in the correct format
         return {
-            "Roles List": json.dumps([
-                {"name": "Role1", "description": "Expert in X", "tools": ["Tool1"]},
-                {"name": "Role2", "description": "Expert in Y", "tools": ["Tool2"]}
-            ]),
-            "Execution Plan": json.dumps([
-                {"step": 1, "description": "Role1 performs Step1 using Tool1"},
-                {"step": 2, "description": "Role2 performs Step2 using Tool2"}
-            ]),
+            "Roles List": "Role1: Expert in X with Tool1; Role2: Expert in Y with Tool2",
+            "Execution Plan": "1. Role1 performs Step1 using Tool1. 2. Role2 performs Step2 using Tool2",
             "Anything UNCLEAR": "Clarification needed on Z."
         }
 
 # Replace the actual AsyncAzureOpenAI client with the mock
 aclient = MockAsyncAzureOpenAI()
-
 from autoagents.logs import logger
 from autoagents.provider.base_gpt_api import BaseGPTAPI
 from autoagents.utils.singleton import Singleton

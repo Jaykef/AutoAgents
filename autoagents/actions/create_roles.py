@@ -38,10 +38,10 @@ You will come up with solutions for any task or problem by following these steps
     "steps": ["step1", "step2", "step3"],
 }}}}
 3. Finally, based on the content of the problem and the expert roles, provide a detailed execution plan with the required steps to solve the problem.
-3.1. The execution plan should be divided into multiple steps to solve the problem step by step. Each step should have at least one expert role to execute. If a step involves multiple expert roles, you need to describe the contributions of each expert role and how they collaborate to produce comprehensive results. 
+3.1. The execution plan should be divided into multiple steps to solve the problem step by step. Each step should have at least one expert role to execute. If a step involves multiple expert roles, you need to describe the contributions of each expert role and how they collaborate to produce comprehensive results.
 3.2  The step description should provide as much detail as possible and explain how the steps are related to each other. The step description must also include the expected output of the current step and specify what inputs are required for the next step. Expected output of the current step and required input for the next step must match each other.
 3.3. NEVER guess the result of a step.
-3.4. Output the execution plan as a numbered list of steps. Please indicate the name of the expert role used at the beginning of the step. If the task is a question, the final step should almost always be 'Given the above steps taken, please respond to the users original question: XXX'. 
+3.4. Output the execution plan as a numbered list of steps. Please indicate the name of the expert role used at the beginning of the step. If the task is a question, the final step should almost always be 'Given the above steps taken, please respond to the users original question: XXX'.
 
 # Format example
 Your final output should ALWAYS in the following format:
@@ -61,7 +61,7 @@ FORMAT_EXAMPLE = '''
 ## Question or Task:
 the input question you must answer / the input task you must finish
 
-## Thought 
+## Thought
 you should always think about what type of expert needs to be added and the key steps needed to accomplish the tasks
 
 ## Roles List:
@@ -96,9 +96,9 @@ class CreateRoles(Action):
 
     async def run(self, context):
         prompt = PROMPT_TEMPLATE.format(context=context, format_example=FORMAT_EXAMPLE, tools=TOOLS)
-        print(f"Prompt: {prompt}")  # Print the prompt to debug
+        logger.debug(f"CreateRoles::run - Prompt: {prompt}")  # Log the prompt to debug
         rsp = await self._aask_v1(prompt, "task", OUTPUT_MAPPING)
-        print(f"Response: {rsp}")  # Print the response to debug
+        logger.debug(f"CreateRoles::run - Response: {rsp}")  # Log the response to debug
         return rsp
 
 
