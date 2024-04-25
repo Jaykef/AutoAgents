@@ -87,7 +87,7 @@ class RoleContext(BaseModel):
 class Role:
     """角色/代理"""
 
-    def __init__(self, name="", profile="", goal="", constraints="", desc="", proxy="", llm_api_key=""):
+    def __init__(self, name="", profile="", goal="", constraints="", desc="", proxy="", llm_api_key="", mock_mode=False):
         self._llm = LLM(proxy, llm_api_key)
         self._setting = RoleSetting(name=name, profile=profile, goal=goal, constraints=constraints, desc=desc)
         self._states = []
@@ -96,6 +96,7 @@ class Role:
         self._rc = RoleContext()
         self._proxy = proxy
         self._llm_api_key = llm_api_key
+        self.mock_mode = mock_mode  # Store mock_mode as an instance variable
 
     def _reset(self):
         self._states = []

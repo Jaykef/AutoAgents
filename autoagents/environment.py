@@ -32,7 +32,8 @@ class Environment(BaseModel):
     llm_api_key: str = Field(default='')
     serpapi_key: str = Field(default='')
     alg_msg_queue: object = Field(default=None)
-    _content_cache: dict = Field(default_factory=dict)
+    mock_mode: bool = Field(default=False)
+    _content_cache: dict = {}
 
     class Config:
         arbitrary_types_allowed = True

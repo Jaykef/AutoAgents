@@ -17,20 +17,21 @@ logger = logging.getLogger(__name__)
 def signal_handler(signal, frame):
     sys.exit(1)
 
-async def commanline(investment: float = 10.0, n_round: int = 3, proxy: str = None, llm_api_key: str = None, serpapi_key: str=None, idea: str=None):
-    if llm_api_key is None:
-        print("OpenAI API key:")
-        llm_api_key = input().strip()
-    if serpapi_key is None:
-        print("SerpAPI key:")
-        serpapi_key = input().strip()
+async def commanline(investment: float = 10.0, n_round: int = 3, proxy: str = None, llm_api_key: str = None, serpapi_key: str=None, idea: str=None, mock_mode: bool=False):
+    if not mock_mode:
+        if llm_api_key is None:
+            print("OpenAI API key:")
+            llm_api_key = input().strip()
+        if serpapi_key is None:
+            print("SerpAPI key:")
+            serpapi_key = input().strip()
     if idea is None:
         print("Give me a task idea:")
         idea = input().strip()
-    await startup.startup(idea, investment, n_round, llm_api_key=llm_api_key, serpapi_key=serpapi_key, proxy=proxy)
+    await startup.startup(idea, investment, n_round, llm_api_key=llm_api_key, serpapi_key=serpapi_key, proxy=proxy, mock_mode=mock_mode)
 
-async def service(host: str = "localhost", port: int = 9000, proxy: str=None, llm_api_key: str=None, serpapi_key: str=None):
-    await ws_service.run_service(host=host, port=port, proxy=proxy, llm_api_key=llm_api_key, serpapi_key=serpapi_key)
+async def service(host: str = "localhost", port: int = 9000, proxy: str=None, llm_api_key: str=None, serpapi_key: str=None, mock_mode: bool=False):
+    await ws_service.run_service(host=host, port=port, proxy=proxy, llm_api_key=llm_api_key, serpapi_key=serpapi_key, mock_mode=mock_mode)
 
 
 if __name__ == "__main__":
@@ -45,6 +46,7 @@ if __name__ == "__main__":
     parser.add_argument("--llm_api_key", default=None, type=str, help="OpenAI API key")
     parser.add_argument("--serpapi_key", default=None, type=str, help="SerpAPI key")
     parser.add_argument("--idea", default=None, type=str, help="Give me a task idea")
+    parser.add_argument("--mock_mode", default=False, action='store_true', help="Enable mock mode to bypass API calls")
     args = parser.parse_args()
 
     proxy = None
@@ -53,8 +55,8 @@ if __name__ == "__main__":
         proxy = args.proxy
 
     if args.mode == "commandline":
-        asyncio.run(commanline(proxy=proxy, llm_api_key=args.llm_api_key, serpapi_key=args.serpapi_key, idea=args.idea))
+        asyncio.run(commanline(proxy=proxy, llm_api_key=args.llm_api_key, serpapi_key=args.serpapi_key, idea=args.idea, mock_mode=args.mock_mode))
     elif args.mode == "service":
-        asyncio.run(service(host=args.host, port=args.port, proxy=proxy, llm_api_key=args.llm_api_key, serpapi_key=args.serpapi_key))
+        asyncio.run(service(host=args.host, port=args.port, proxy=proxy, llm_api_key=args.llm_api_key, serpapi_key=args.serpapi_key, mock_mode=args.mock_mode))
     else:
         logger.error(f"Invalid mode: {args.mode}")

@@ -18,7 +18,7 @@ class Explorer(BaseModel):
     """
     environment: Environment = Field(default_factory=Environment)
     investment: float = Field(default=10.0)
-    
+
     class Config:
         arbitrary_types_allowed = True
 
@@ -36,14 +36,15 @@ class Explorer(BaseModel):
         if CONFIG.total_cost > CONFIG.max_budget:
             raise NoMoneyException(CONFIG.total_cost, f'Insufficient funds: {CONFIG.max_budget}')
 
-    async def start_project(self, idea=None, llm_api_key=None, proxy=None, serpapi_key=None, task_id=None, alg_msg_queue=None):
+    async def start_project(self, idea=None, llm_api_key=None, proxy=None, serpapi_key=None, task_id=None, alg_msg_queue=None, mock_mode=False):
         """Start a project from publishing boss requirement."""
         self.environment.llm_api_key = llm_api_key
         self.environment.proxy = proxy
         self.environment.task_id = task_id
         self.environment.alg_msg_queue = alg_msg_queue
         self.environment.serpapi_key = serpapi_key
-        
+        self.environment.mock_mode = mock_mode
+
         await self.environment.publish_message(Message(role="Question/Task", content=idea, cause_by=Requirement))
 
     def _save(self):

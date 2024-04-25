@@ -129,6 +129,7 @@ class OpenAIGPTAPI(BaseGPTAPI, RateLimiter):
     def __init__(self, proxy='', api_key=''):
         self.proxy = proxy
         self.api_key = api_key
+        self.mock_mode = False  # New attribute to enable mock mode
         self.__init_openai(CONFIG)
         self.llm = openai
         self.model = CONFIG.openai_api_model
@@ -140,12 +141,12 @@ class OpenAIGPTAPI(BaseGPTAPI, RateLimiter):
             openai.proxy = self.proxy
         else:
             openai.api_key = config.openai_api_key
-        
+
         if self.api_key != '':
             openai.api_key = self.api_key
         else:
             openai.api_key = config.openai_api_key
-        
+
         if config.openai_api_base:
             openai.api_base = config.openai_api_base
         if config.openai_api_type:
@@ -154,6 +155,8 @@ class OpenAIGPTAPI(BaseGPTAPI, RateLimiter):
         self.rpm = int(config.get("RPM", 10))
 
     async def _achat_completion_stream(self, messages: list[dict]) -> str:
+        if self.mock_mode:
+            return "Mock response for testing"  # Return a mock response if in mock mode
         response = await openai.ChatCompletion.acreate(
             **self._cons_kwargs(messages),
             stream=True
