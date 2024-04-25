@@ -8,7 +8,7 @@ from pydantic import BaseModel, Field
 
 # from autoagents.environment import Environment
 from autoagents.config import CONFIG
-from autoagents.actions import Action, ActionOutput
+from autoagents.actions import Action, ActionOutput, CreateRoles, PublishMessage
 from autoagents.llm import LLM
 from autoagents.logs import logger
 from autoagents.memory import Memory, LongTermMemory
@@ -157,21 +157,27 @@ class Role:
         self._set_state(int(next_state))
 
     async def _act(self) -> Message:
-        # prompt = self.get_prefix()
-        # prompt += ROLE_TEMPLATE.format(name=self.profile, state=self.states[self.state], result=response,
-        #                                history=self.history)
-
         logger.info(f"{self._setting}: ready to {self._rc.todo}")
-        response = await self._rc.todo.run(self._rc.important_memory)
-        # logger.info(response)
-        if isinstance(response, ActionOutput):
-            msg = Message(content=response.content, instruct_content=response.instruct_content,
-                          role=self.profile, cause_by=type(self._rc.todo))
+        if self.mock_mode:
+            # Return a mock message when mock_mode is enabled
+            mock_responses = {
+                CreateRoles: "Mock response for CreateRoles action.",
+                PublishMessage: "Mock response for PublishMessage action.",
+                # Add more mock responses for other actions as needed
+            }
+            action_type = type(self._rc.todo)
+            mock_content = mock_responses.get(action_type, "Default mock response.")
+            msg = Message(content=mock_content, instruct_content=mock_content,
+                          role=self.profile, cause_by=action_type)
         else:
-            msg = Message(content=response, role=self.profile, cause_by=type(self._rc.todo))
+            # Execute the action as normal when mock_mode is not enabled
+            response = await self._rc.todo.run(self._rc.important_memory)
+            if isinstance(response, ActionOutput):
+                msg = Message(content=response.content, instruct_content=response.instruct_content,
+                              role=self.profile, cause_by=type(self._rc.todo))
+            else:
+                msg = Message(content=response, role=self.profile, cause_by=type(self._rc.todo))
         self._rc.memory.add(msg)
-        # logger.debug(f"{response}")
-
         return msg
 
     async def _observe(self) -> int:
@@ -179,9 +185,9 @@ class Role:
         if not self._rc.env:
             return 0
         env_msgs = self._rc.env.memory.get()
-        
+
         observed = self._rc.env.memory.get_by_actions(self._rc.watch)
-        
+
         news = self._rc.memory.remember(observed)  # remember recent exact or similar memories
 
         for i in env_msgs:
@@ -214,7 +220,7 @@ class Role:
         self._rc.memory.add(message)
 
     async def handle(self, message: Message) -> Message:
-        """接收信息，并用行动回复"""
+        """接收信息???并用行动回复"""
         # logger.debug(f"{self.name=}, {self.profile=}, {message.role=}")
         self.recv(message)
 
