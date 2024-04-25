@@ -8,7 +8,7 @@ from pydantic import BaseModel, Field
 
 # from autoagents.environment import Environment
 from autoagents.config import CONFIG
-from autoagents.actions import Action, ActionOutput, CreateRoles, PublishMessage
+from autoagents.actions import Action, ActionOutput, CreateRoles
 from autoagents.llm import LLM
 from autoagents.logs import logger
 from autoagents.memory import Memory, LongTermMemory
@@ -161,14 +161,13 @@ class Role:
         if self.mock_mode:
             # Return a mock message when mock_mode is enabled
             mock_responses = {
-                CreateRoles: "Mock response for CreateRoles action.",
-                PublishMessage: "Mock response for PublishMessage action.",
+                "CreateRoles": "Mock response for CreateRoles action.",
                 # Add more mock responses for other actions as needed
             }
-            action_type = type(self._rc.todo)
+            action_type = self._rc.todo.__class__.__name__
             mock_content = mock_responses.get(action_type, "Default mock response.")
             msg = Message(content=mock_content, instruct_content=mock_content,
-                          role=self.profile, cause_by=action_type)
+                          role=self.profile, cause_by=self._rc.todo)
         else:
             # Execute the action as normal when mock_mode is not enabled
             response = await self._rc.todo.run(self._rc.important_memory)
