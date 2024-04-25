@@ -32,6 +32,7 @@ class Environment(BaseModel):
     llm_api_key: str = Field(default='')
     serpapi_key: str = Field(default='')
     alg_msg_queue: object = Field(default=None)
+    _content_cache: dict = Field(default_factory=dict)
 
     class Config:
         arbitrary_types_allowed = True
@@ -61,7 +62,7 @@ class Environment(BaseModel):
             print('Role', i, agent)
 
         return agents_args
-    
+
     def _parser_plan(self, context):
         """解析生成的计划Plan"""
         plan_context = re.findall('## Revised Execution Plan([\s\S]*?)##', str(context))[0]
@@ -71,14 +72,12 @@ class Environment(BaseModel):
             print('Step', i, step)
 
         return steps
-    
-    def create_roles(self, plan: list, args: dict):
-        """创建Role""" 
 
+    def create_roles(self, plan: list, args: dict):
+        """Create Role instances based on the provided plan and arguments."""
         init_actions, watch_actions = [], []
         for role in args:
-            class_name = role['name'].replace(' ', '_') + '_Requirement'
-            requirement_type = type(class_name, (Requirement,), {})
+            requirement_type = self.requirement_factory(role['name'])
             print('Add a new role:', role['name'])
             self.add_role(CustomRole(
                 name=role['name'],
@@ -94,7 +93,7 @@ class Environment(BaseModel):
             ))
             watch_actions.append(requirement_type)
             init_actions.append(self.get_role(role['name']).init_actions)
-        
+
         init_actions.append(Requirement)
         self.add_role(ActionObserver(steps=plan, watch_actions=init_actions, init_actions=watch_actions, proxy=self.proxy, llm_api_key=self.llm_api_key))
 
@@ -108,49 +107,51 @@ class Environment(BaseModel):
             self.steps = self._parser_plan(message.content)
             self.new_roles = self.create_roles(self.steps, self.new_roles_args)
 
+        parsed_content = self._parse_message_content(message)
+        if parsed_content:
+            filename, file_content = parsed_content
+
+        if message.role and 'ActionObserver' != message.role:
+            msg = self._format_message_for_queue(message, filename, file_content)
+            if self.alg_msg_queue:
+                self.alg_msg_queue.put_nowait(msg)
+
+        if 'Agents Observer' in message.role:
+            self.new_roles_args = self._parser_roles(message.content)
+            msg = self._format_message_for_queue(message)
+            if self.alg_msg_queue:
+                self.alg_msg_queue.put_nowait(msg)
+
+    def _parse_message_content(self, message: Message):
+        """Parse the content of the message and return the filename and file content if present."""
+        # Use a hash of the message content as the cache key
+        cache_key = hash(message.content)
+        # Check if we have already parsed this message content
+        if cache_key in self._content_cache:
+            return self._content_cache[cache_key]
+
         filename, file_content = None, None
         if hasattr(message.instruct_content, 'Type') and 'FILE' in message.instruct_content.Type:
             filename = message.instruct_content.Key
             file_type = re.findall('```(.*?)\n', str(message.content))[0]
             file_content = re.findall(f'```{file_type}([\s\S]*?)```', str(message.content))[0]
-        
-        if message.role and 'ActionObserver' != message.role:
-            # print('\n************MEG**************')
-            # print(message.role)
-            # print(message)
-            # print(filename)
-            # print('*******************************')
+            # Store the parsed content in the cache
+            self._content_cache[cache_key] = (filename, file_content)
 
-            msg = {   
-                'timestamp': timestamp(),
-                'role': message.role,
-                'content': message.content,
-                'file': {
-                    'file_type': filename,
-                    'file_data': file_content,
-                }
+        return filename, file_content
+
+    def _format_message_for_queue(self, message: Message, filename=None, file_content=None):
+        """Format the message for adding to the message queue."""
+        msg = {
+            'timestamp': timestamp(),
+            'role': message.role,
+            'content': message.content,
+            'file': {
+                'file_type': filename,
+                'file_data': file_content,
             }
-
-            if self.alg_msg_queue:
-                self.alg_msg_queue.put_nowait(format_message(action=MessageType.RunTask.value, data={'task_id': self.task_id, 'task_message':msg}))
-        
-        if 'Agents Observer' in message.role:
-            self.new_roles_args = self._parser_roles(message.content)
-            # send role list
-            msg = {   
-                'timestamp': timestamp(),
-                'role': "Revised Role List",
-                'content': self.new_roles_args,
-                'file': {
-                    'file_type': None,
-                    'file_data': None,
-                }
-            }
-
-            if self.alg_msg_queue:
-                self.alg_msg_queue.put_nowait(format_message(action=MessageType.RunTask.value, data={'task_id': self.task_id, 'task_message':msg}))
-
-
+        }
+        return format_message(action=MessageType.RunTask.value, data={'task_id': self.task_id, 'task_message': msg})
 
     async def run(self, k=1):
         """处理一次所有Role的运行"""
@@ -162,7 +163,7 @@ class Environment(BaseModel):
                 role = self.roles[key]
                 future = role.run()
                 futures.append(future)
-            
+
             await asyncio.gather(*futures)
 
         if len(old_roles) < len(self.roles):
@@ -184,3 +185,16 @@ class Environment(BaseModel):
     def get_role(self, name: str) -> Role:
         """获得环境内的指定Role"""
         return self.roles.get(name, None)
+
+    def requirement_factory(self, role_name: str):
+        """Factory method to create Requirement instances based on role name."""
+        # Mapping of role names to Requirement subclasses
+        requirement_classes = {
+            'Manager': ManagerRequirement,
+            'Observer': ObserverRequirement,
+            # Add mappings for other roles as needed
+        }
+        # Get the Requirement subclass based on role name, default to generic Requirement if not found
+        requirement_class = requirement_classes.get(role_name.replace(' ', '_'), Requirement)
+        # Instantiate and return the Requirement subclass
+        return requirement_class()
