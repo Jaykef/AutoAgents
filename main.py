@@ -6,6 +6,7 @@ import sys
 import signal
 import re
 import logging
+import os
 from autoagents.roles import Manager, ObserverAgents, ObserverPlans
 from autoagents.explorer import Explorer
 import startup
@@ -20,8 +21,10 @@ def signal_handler(signal, frame):
 async def commanline(investment: float = 10.0, n_round: int = 3, proxy: str = None, llm_api_key: str = None, serpapi_key: str=None, idea: str=None, mock_mode: bool=False):
     if not mock_mode:
         if llm_api_key is None:
-            print("OpenAI API key:")
-            llm_api_key = input().strip()
+            llm_api_key = os.getenv('OPENAI_API_KEY')
+            if llm_api_key is None:
+                print("OpenAI API key:")
+                llm_api_key = input().strip()
         if serpapi_key is None:
             print("SerpAPI key:")
             serpapi_key = input().strip()
