@@ -191,7 +191,7 @@ class Environment(BaseModel):
         """Factory method to create Requirement instances based on role name."""
         # Mapping of role names to Requirement subclasses
         requirement_classes = {
-            'Manager': ManagerRequirement,
+            # 'Manager': ManagerRequirement,  # This line will be removed as ManagerRequirement is not defined
             'Observer': ObserverRequirement,
             # Add mappings for other roles as needed
         }
