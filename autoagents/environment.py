@@ -192,7 +192,7 @@ class Environment(BaseModel):
         # Mapping of role names to Requirement subclasses
         requirement_classes = {
             # 'Manager': ManagerRequirement,  # This line will be removed as ManagerRequirement is not defined
-            'Observer': ObserverRequirement,
+            # 'Observer': ObserverRequirement,  # This line will be commented out as ObserverRequirement is not defined
             # Add mappings for other roles as needed
         }
         # Get the Requirement subclass based on role name, default to generic Requirement if not found
