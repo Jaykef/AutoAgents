@@ -22,6 +22,7 @@ async def commanline(investment: float = 10.0, n_round: int = 3, proxy: str = No
     if not mock_mode:
         if llm_api_key is None:
             llm_api_key = os.getenv('OPENAI_API_KEY')
+            print(f"Environment variable OPENAI_API_KEY: {llm_api_key}")  # Print the environment variable for debugging
             if llm_api_key is None:
                 print("OpenAI API key:")
                 llm_api_key = input().strip()
