@@ -29,7 +29,7 @@ AutoAgents is an experimental open-source application for An Automatic Agents Ge
 - **Actions**: The specific actions of the expert roles in the execution plan, such as calling tools or outputting results.
 
 ## Demo
-Online demo: 
+Online demo:
 - [Demo / HuggingFace Spaces](https://huggingface.co/spaces/LinkSoul/AutoAgents)
 
 Video demo:
