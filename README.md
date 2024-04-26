@@ -118,3 +118,38 @@ If you find our work and this repository useful, please consider giving a star :
 
 ## Acknowledgements
 This code base has borrowed several implementations from this [link](https://github.com/geekan/MetaGPT)
+
+## MLX Integration
+
+This section provides details on integrating the mlx machine learning framework into the AutoAgents codebase. MLX is a NumPy-like array framework designed for machine learning on Apple silicon, which features composable function transformations, lazy computation, and multi-device operations.
+
+### Installation with MLX
+
+To install the necessary components for mlx integration, follow these steps:
+
+`bash
+# Install mlx and its dependencies
+pip install mlx
+
+# Additional steps for Apple silicon configuration
+# ...
+`
+
+### Running the Demo with MLX
+
+To run the demo using the mlx framework, execute the following command:
+
+`bash
+python demo_autoagents.py
+`
+
+This script will prompt the gguf model to generate multiple agents to solve a given prompt using the mlx framework.
+
+### Additional Configuration for Apple Silicon
+
+For systems running on Apple silicon, additional configuration may be required to optimize performance:
+
+`bash
+# Configuration steps for Apple silicon
+# ...
+`
