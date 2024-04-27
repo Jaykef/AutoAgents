@@ -42,22 +42,24 @@ class Config(metaclass=Singleton):
         self._init_with_config_files_and_env(self._configs, yaml_file)
         logger.info("Config loading done.")
         self.global_proxy = self._get("GLOBAL_PROXY")
-        self.openai_api_key = self._get("OPENAI_API_KEY")
+        # self.openai_api_key = self._get("OPENAI_API_KEY")
+        self.llama_cpp_server_url = self._get("LLAMA_CPP_SERVER_URL")
+        self.gguf_model_path = self._get("GGUF_MODEL_PATH")
         # if not self.openai_api_key or "YOUR_API_KEY" == self.openai_api_key:
         #     raise NotConfiguredException("Set OPENAI_API_KEY first")
 
-        self.openai_api_base = self._get("OPENAI_API_BASE")
-        self.openai_proxy = self._get("OPENAI_PROXY")
+        # self.openai_api_base = self._get("OPENAI_API_BASE")
+        # self.openai_proxy = self._get("OPENAI_PROXY")
         # if not self.openai_api_base or "YOUR_API_BASE" == self.openai_api_base:
         #     openai_proxy = self._get("OPENAI_PROXY") or self.global_proxy
         #     if openai_proxy:
         #         openai.proxy = openai_proxy
         #     else:
         #         logger.info("Set OPENAI_API_BASE in case of network issues")
-        self.openai_api_type = self._get("OPENAI_API_TYPE")
-        self.openai_api_version = self._get("OPENAI_API_VERSION")
-        self.openai_api_rpm = self._get("RPM", 3)
-        self.openai_api_model = self._get("OPENAI_API_MODEL", "gpt-4")
+        # self.openai_api_type = self._get("OPENAI_API_TYPE")
+        # self.openai_api_version = self._get("OPENAI_API_VERSION")
+        # self.openai_api_rpm = self._get("RPM", 3)
+        # self.openai_api_model = self._get("OPENAI_API_MODEL", "gpt-4")
         self.max_tokens_rsp = self._get("MAX_TOKENS", 2048)
         self.deployment_id = self._get("DEPLOYMENT_ID")
 
@@ -67,11 +69,11 @@ class Config(metaclass=Singleton):
         self.google_api_key = self._get("GOOGLE_API_KEY")
         self.google_cse_id = self._get("GOOGLE_CSE_ID")
         self.search_engine = self._get("SEARCH_ENGINE", SearchEngineType.SERPAPI_GOOGLE)
- 
+
         self.web_browser_engine = WebBrowserEngineType(self._get("WEB_BROWSER_ENGINE", "playwright"))
         self.playwright_browser_type = self._get("PLAYWRIGHT_BROWSER_TYPE", "chromium")
         self.selenium_browser_type = self._get("SELENIUM_BROWSER_TYPE", "chrome")
-      
+
         self.long_term_memory = self._get('LONG_TERM_MEMORY', False)
         if self.long_term_memory:
             logger.warning("LONG_TERM_MEMORY is True")

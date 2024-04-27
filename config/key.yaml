@@ -1,0 +1,6 @@
+# Configuration for SerpAPI
+SERPAPI_API_KEY: "REPLACE_WITH_YOUR_SERPAPI_KEY"
+
+# Configuration for llama.cpp server using local gguf model
+LLAMA_CPP_SERVER_URL: "http://localhost:8080"
+GGUF_MODEL_PATH: "/home/ubuntu/TinyLlama-1.1B-Chat-v1.0-GGUF/tinyllama-1.1b-chat-v1.0.Q4_0.gguf"

@@ -6,8 +6,6 @@ from autoagents.schema import Message
 
 
 class Manager:
-    OPENAI_API_KEY: str = ""
-    OPENAI_PROXY: str = ""
     def __init__(self, llm: LLM = LLM()):
         self.llm = llm  # Large Language Model
         self.role_directions = {
