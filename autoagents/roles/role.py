@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+# From: https://github.com/geekan/MetaGPT/blob/main/metagpt/roles/role.py
 from __future__ import annotations
 
 from typing import Iterable, Type
@@ -7,12 +8,12 @@ from typing import Iterable, Type
 from pydantic import BaseModel, Field
 
 # from autoagents.environment import Environment
-from autoagents.config import CONFIG
 from autoagents.actions import Action, ActionOutput
-from autoagents.llm import LLM
-from autoagents.logs import logger
-from autoagents.memory import Memory, LongTermMemory
-from autoagents.schema import Message
+from autoagents.system.config import CONFIG
+from autoagents.system.llm import LLM
+from autoagents.system.logs import logger
+from autoagents.system.memory import Memory, LongTermMemory
+from autoagents.system.schema import Message
 
 PREFIX_TEMPLATE = """You are a {profile}, named {name}, your goal is {goal}, and the constraint is {constraints}. """
 
@@ -87,15 +88,17 @@ class RoleContext(BaseModel):
 class Role:
     """角色/代理"""
 
-    def __init__(self, name="", profile="", goal="", constraints="", desc="", proxy="", llm_api_key=""):
+    def __init__(self, name="", profile="", goal="", constraints="", desc="", proxy="", llm_api_key="", serpapi_api_key=""):
         self._llm = LLM(proxy, llm_api_key)
         self._setting = RoleSetting(name=name, profile=profile, goal=goal, constraints=constraints, desc=desc)
         self._states = []
         self._actions = []
+        self.init_actions = None
         self._role_id = str(self._setting)
         self._rc = RoleContext()
         self._proxy = proxy
         self._llm_api_key = llm_api_key
+        self._serpapi_api_key = serpapi_api_key
 
     def _reset(self):
         self._states = []
@@ -103,12 +106,13 @@ class Role:
 
     def _init_actions(self, actions):
         self._reset()
+        self.init_actions = actions[0]
         for idx, action in enumerate(actions):
             if not isinstance(action, Action):
                 i = action("")
             else:
                 i = action
-            i.set_prefix(self._get_prefix(), self.profile, self._proxy, self._llm_api_key)
+            i.set_prefix(self._get_prefix(), self.profile, self._proxy, self._llm_api_key, self._serpapi_api_key)
             self._actions.append(i)
             self._states.append(f"{idx}. {action}")
 

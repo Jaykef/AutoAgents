@@ -12,6 +12,7 @@
 <p align="center">
 <a href="docs/README_CN.md"><img src="https://img.shields.io/badge/文档-中文版-blue.svg" alt="CN doc"></a>
 <a href="README.md"><img src="https://img.shields.io/badge/document-English-blue.svg" alt="EN doc"></a>
+<a href="./README_JA.md"><img src="https://img.shields.io/badge/ドキュメント-日本語-blue.svg" alt="JA doc"></a>
 <a href="https://opensource.org/license/apache-2-0"><img src="https://img.shields.io/badge/License-apache2-yellow.svg" alt="License: MIT"></a>
 </p>
 
@@ -96,3 +97,6 @@ docker run -it --rm -p 7860:7860 "${IMAGE}:${VERSION}"
 - **GitHub 问题:**  对于更技术性的问题，您也可以在我们的 [GitHub repository](https://github.com/LinkSoul-AI/AutoAgents/issues)中创建一个新的问题。
 
 我们会在2-3个工作日内回复所有问题。
+
+## 致谢
+AutoAgents 遵守 MIT 协议开源，其中项目的虚拟环境部分基于同样使用 MIT 协议的开源项目 [MetaGPT](https://github.com/geekan/MetaGPT) 实现。
