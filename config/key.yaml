@@ -1,5 +1,5 @@
 # Configuration for SerpAPI
-SERPAPI_API_KEY: "REPLACE_WITH_YOUR_SERPAPI_KEY"
+SERPAPI_API_KEY: "c8a3d4e9381549a9d0303424dfb1800fbf98391630205293a0f9fb045351d988"
 
 # Configuration for llama.cpp server using local gguf model
 LLAMA_CPP_SERVER_URL: "http://localhost:8080"
